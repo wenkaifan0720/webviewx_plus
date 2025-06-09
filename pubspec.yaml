@@ -11,21 +11,21 @@ platforms:
 
 
 environment:
-  sdk: '>=3.4.0 <4.0.0'
+  sdk: '>=3.7.0 <4.0.0'
   flutter: ">=3.22.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.1.1
+  http: ^1.4.0
   path: ^1.8.0
   pointer_interceptor: ^0.10.0
   uuid: ^4.2.2
-  webview_flutter: ^4.7.0
-  webview_flutter_android: ^3.16.1
-  webview_flutter_platform_interface: ^2.10.0
-  webview_flutter_wkwebview: ^3.13.1
-  web: ^0.5.1
+  webview_flutter: ^4.13.0
+  webview_flutter_android: ^4.7.0
+  webview_flutter_platform_interface: ^2.13.1
+  webview_flutter_wkwebview: ^3.22.0
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:
