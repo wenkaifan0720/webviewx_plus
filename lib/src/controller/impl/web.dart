@@ -126,11 +126,9 @@ class WebViewXController extends ChangeNotifier
   /// ```
   @override
   Future<dynamic> callJsMethod(String name, List<dynamic> params) {
-    if (params.isEmpty) {
-      return Future<dynamic>.value(connector.callMethod(name.toJS));
-    }
+    final jsParams = <js.JSAny>[];
 
-    final jsParams = <js.JSAny>[]; // Create an empty JSArray
+    // Convert all parameters to JS types
     for (var param in params) {
       if (param is String) {
         jsParams.add(param.toJS);
@@ -139,14 +137,18 @@ class WebViewXController extends ChangeNotifier
       } else if (param is bool) {
         jsParams.add(param.toJS);
       } else if (param is Map || param is List) {
-        jsParams.add(param.toJSBox);
+        // Convert Dart collections to JS using proper serialization
+        jsParams.add(jsonEncode(param).toJS);
+      } else if (param == null) {
+        jsParams.add('null'.toJS);
       } else {
         // Convert complex objects to JSON-serializable form
         jsParams.add(jsonEncode(param).toJS);
       }
     }
 
-    final result = connector.callMethod(name.toJS, jsParams.toJS);
+    // Use callMethodVarArgs for consistent parameter passing
+    final result = connector.callMethodVarArgs(name.toJS, jsParams);
     return Future<dynamic>.value(result);
   }
 
