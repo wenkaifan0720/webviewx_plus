@@ -162,9 +162,10 @@ class WebViewXController extends ChangeNotifier
     String rawJavascript, {
     bool inGlobalContext = false,
   }) {
+    final jsParams = <js.JSAny>[rawJavascript.toJS];
     final result = (inGlobalContext ? js.globalContext : connector).callMethod(
       'eval'.toJS,
-      [rawJavascript].toJSBox,
+      jsParams.toJS,
     );
     return Future<dynamic>.value(result);
   }
