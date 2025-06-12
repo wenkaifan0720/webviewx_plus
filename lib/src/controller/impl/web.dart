@@ -1,4 +1,5 @@
 import 'dart:async' show Future;
+import 'dart:convert';
 import 'dart:js_interop' as js;
 import 'dart:js_interop_unsafe';
 
@@ -31,13 +32,13 @@ class WebViewXController extends ChangeNotifier
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-  })  : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
-        _history = HistoryStack<WebViewContent>(
-          initialEntry: WebViewContent(
-            source: initialContent,
-            sourceType: initialSourceType,
-          ),
-        );
+  }) : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+       _history = HistoryStack<WebViewContent>(
+         initialEntry: WebViewContent(
+           source: initialContent,
+           sourceType: initialSourceType,
+         ),
+       );
 
   /// Boolean getter which reveals if the gestures are ignored right now
   @override
@@ -124,11 +125,28 @@ class WebViewXController extends ChangeNotifier
   /// print(resultFromJs); // prints "This is a test"
   /// ```
   @override
-  Future<dynamic> callJsMethod(
-    String name,
-    List<dynamic> params,
-  ) {
-    final result = connector.callMethod(name.toJS, params.toJSBox);
+  Future<dynamic> callJsMethod(String name, List<dynamic> params) {
+    if (params.isEmpty) {
+      return Future<dynamic>.value(connector.callMethod(name.toJS));
+    }
+
+    final jsParams = <js.JSAny>[]; // Create an empty JSArray
+    for (var param in params) {
+      if (param is String) {
+        jsParams.add(param.toJS);
+      } else if (param is num) {
+        jsParams.add(param.toJS);
+      } else if (param is bool) {
+        jsParams.add(param.toJS);
+      } else if (param is Map || param is List) {
+        jsParams.add(param.toJSBox);
+      } else {
+        // Convert complex objects to JSON-serializable form
+        jsParams.add(jsonEncode(param).toJS);
+      }
+    }
+
+    final result = connector.callMethod(name.toJS, jsParams.toJS);
     return Future<dynamic>.value(result);
   }
 
